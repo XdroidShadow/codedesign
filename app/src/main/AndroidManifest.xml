@@ -3,6 +3,7 @@
     package="com.xd.spring2">
 
     <application
+        android:name=".XDApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
