@@ -6,31 +6,31 @@ import android.util.ArraySet;
 
 import androidx.annotation.NonNull;
 
-import com.xdroid.spring.codedesign.launchstarter.task.Task;
-import com.xdroid.spring.codedesign.launchstarter.utils.DispatcherLog;
+import com.xdroid.spring.codedesign.launchstarter.task.XDChildThreadTask;
+import com.xdroid.spring.codedesign.launchstarter.utils.X_DispatcherLog;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 
-public class TaskSortUtil {
+public class X_TaskSortUtil {
 
-    private static List<Task> sNewTasksHigh = new ArrayList<>();// 高优先级的Task
+    private static List<XDChildThreadTask> sNewTasksHigh = new ArrayList<>();// 高优先级的Task
 
     /**
      * 任务的有向无环图的拓扑排序
      *
      * @return
      */
-    public static synchronized List<Task> getSortResult(List<Task> originTasks,
-                                                        List<Class<? extends Task>> clsLaunchTasks) {
+    public static synchronized List<XDChildThreadTask> getSortResult(List<XDChildThreadTask> originTasks,
+                                                                     List<Class<? extends XDChildThreadTask>> clsLaunchTasks) {
         long makeTime = System.currentTimeMillis();
 
         Set<Integer> dependSet = new ArraySet<>();
-        Graph graph = new Graph(originTasks.size());
+        X_Graph graph = new X_Graph(originTasks.size());
         for (int i = 0; i < originTasks.size(); i++) {
-            Task task = originTasks.get(i);
+            XDChildThreadTask task = originTasks.get(i);
             if (task.isSend() || task.dependsOn() == null || task.dependsOn().size() == 0) {
                 continue;
             }
@@ -45,25 +45,25 @@ public class TaskSortUtil {
             }
         }
         List<Integer> indexList = graph.topologicalSort();
-        List<Task> newTasksAll = getResultTasks(originTasks, dependSet, indexList);
+        List<XDChildThreadTask> newTasksAll = getResultTasks(originTasks, dependSet, indexList);
 
-        DispatcherLog.i("task analyse cost makeTime " + (System.currentTimeMillis() - makeTime));
+        X_DispatcherLog.i("task analyse cost makeTime " + (System.currentTimeMillis() - makeTime));
         printAllTaskName(newTasksAll);
         return newTasksAll;
     }
 
     @NonNull
-    private static List<Task> getResultTasks(List<Task> originTasks,
-                                             Set<Integer> dependSet, List<Integer> indexList) {
-        List<Task> newTasksAll = new ArrayList<>(originTasks.size());
-        List<Task> newTasksDepended = new ArrayList<>();// 被别人依赖的
-        List<Task> newTasksWithOutDepend = new ArrayList<>();// 没有依赖的
-        List<Task> newTasksRunAsSoon = new ArrayList<>();// 需要提升自己优先级的，先执行（这个先是相对于没有依赖的先）
+    private static List<XDChildThreadTask> getResultTasks(List<XDChildThreadTask> originTasks,
+                                                          Set<Integer> dependSet, List<Integer> indexList) {
+        List<XDChildThreadTask> newTasksAll = new ArrayList<>(originTasks.size());
+        List<XDChildThreadTask> newTasksDepended = new ArrayList<>();// 被别人依赖的
+        List<XDChildThreadTask> newTasksWithOutDepend = new ArrayList<>();// 没有依赖的
+        List<XDChildThreadTask> newTasksRunAsSoon = new ArrayList<>();// 需要提升自己优先级的，先执行（这个先是相对于没有依赖的先）
         for (int index : indexList) {
             if (dependSet.contains(index)) {
                 newTasksDepended.add(originTasks.get(index));
             } else {
-                Task task = originTasks.get(index);
+                XDChildThreadTask task = originTasks.get(index);
                 if (task.needRunAsSoon()) {
                     newTasksRunAsSoon.add(task);
                 } else {
@@ -79,16 +79,16 @@ public class TaskSortUtil {
         return newTasksAll;
     }
 
-    private static void printAllTaskName(List<Task> newTasksAll) {
+    private static void printAllTaskName(List<XDChildThreadTask> newTasksAll) {
         if (true) {
             return;
         }
-        for (Task task : newTasksAll) {
-            DispatcherLog.i(task.getClass().getSimpleName());
+        for (XDChildThreadTask task : newTasksAll) {
+            X_DispatcherLog.i(task.getClass().getSimpleName());
         }
     }
 
-    public static List<Task> getTasksHigh() {
+    public static List<XDChildThreadTask> getTasksHigh() {
         return sNewTasksHigh;
     }
 
@@ -99,8 +99,8 @@ public class TaskSortUtil {
      * @param taskName
      * @return
      */
-    private static int getIndexOfTask(List<Task> originTasks,
-                                      List<Class<? extends Task>> clsLaunchTasks, Class cls) {
+    private static int getIndexOfTask(List<XDChildThreadTask> originTasks,
+                                      List<Class<? extends XDChildThreadTask>> clsLaunchTasks, Class cls) {
         int index = clsLaunchTasks.indexOf(cls);
         if (index >= 0) {
             return index;

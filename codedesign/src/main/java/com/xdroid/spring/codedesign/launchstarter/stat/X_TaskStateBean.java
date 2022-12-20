@@ -1,6 +1,6 @@
 package com.xdroid.spring.codedesign.launchstarter.stat;
 
-class TaskStatBean {
+class X_TaskStateBean {
 
     private String situation;
     private int count;

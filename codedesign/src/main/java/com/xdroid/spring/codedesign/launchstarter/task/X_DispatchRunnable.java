@@ -1,29 +1,25 @@
 package com.xdroid.spring.codedesign.launchstarter.task;
 
-import android.os.Looper;
 import android.os.Process;
-import android.util.Log;
 
-import androidx.core.os.TraceCompat;
-
-import com.xdroid.spring.codedesign.launchstarter.TaskDispatcher;
-import com.xdroid.spring.codedesign.launchstarter.stat.TaskStat;
+import com.xdroid.spring.codedesign.launchstarter.XDTaskLauncher;
+import com.xdroid.spring.codedesign.launchstarter.stat.X_TaskState;
 import com.xdroid.spring.codedesign.log.X_Log;
 
 /**
  * 任务真正执行的地方
  */
 
-public class DispatchRunnable implements Runnable {
+public class X_DispatchRunnable implements Runnable {
     private static final String TAG = "DispatchRunnable";
-    private Task mTask;
-    private TaskDispatcher mTaskDispatcher;
+    private XDChildThreadTask mTask;
+    private XDTaskLauncher mTaskDispatcher;
 
-    public DispatchRunnable(Task task) {
+    public X_DispatchRunnable(XDChildThreadTask task) {
         this.mTask = task;
     }
 
-    public DispatchRunnable(Task task, TaskDispatcher dispatcher) {
+    public X_DispatchRunnable(XDChildThreadTask task, XDTaskLauncher dispatcher) {
         this.mTask = task;
         this.mTaskDispatcher = dispatcher;
     }
@@ -55,7 +51,7 @@ public class DispatchRunnable implements Runnable {
         if (!mTask.needCall() || !mTask.runOnMainThread()) {
             printTaskLog(startTime, waitTime);
 
-            TaskStat.markTaskDone();
+            X_TaskState.markTaskDone();
             mTask.setFinished(true);
             if (mTaskDispatcher != null) {
                 mTaskDispatcher.satisfyChildren(mTask);
@@ -73,7 +69,7 @@ public class DispatchRunnable implements Runnable {
      * @param waitTime
      */
     private void printTaskLog(long startTime, long waitTime) {
-        if (TaskDispatcher.isDebug()) {
+        if (XDTaskLauncher.isDebug()) {
             long runTime = System.currentTimeMillis() - startTime;
             X_Log.i(TAG, "【"+mTask.getClass().getSimpleName()+"】"+"执行耗时: "+ runTime);
 

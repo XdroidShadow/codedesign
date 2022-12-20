@@ -1,6 +1,6 @@
 package com.xdroid.spring.codedesign.launchstarter.task;
 
-public interface TaskCallBack {
+public interface X_TaskCallBack {
 
     void call();
 }

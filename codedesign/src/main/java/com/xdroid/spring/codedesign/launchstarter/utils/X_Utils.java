@@ -1,4 +1,4 @@
-package com.xdroid.spring.codedesign.utils;
+package com.xdroid.spring.codedesign.launchstarter.utils;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -10,7 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
-public class Utils {
+public class X_Utils {
 
     private static String sCurProcessName = null;
 

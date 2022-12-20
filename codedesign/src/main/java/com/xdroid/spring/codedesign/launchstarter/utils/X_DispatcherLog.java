@@ -2,7 +2,7 @@ package com.xdroid.spring.codedesign.launchstarter.utils;
 
 import android.util.Log;
 
-public class DispatcherLog {
+public class X_DispatcherLog {
 
     private static boolean sDebug = true;
 

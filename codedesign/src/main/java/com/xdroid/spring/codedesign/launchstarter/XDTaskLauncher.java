@@ -2,19 +2,18 @@ package com.xdroid.spring.codedesign.launchstarter;
 
 import android.content.Context;
 import android.os.Looper;
-import android.util.Log;
 
 
 import androidx.annotation.UiThread;
 
-import com.xdroid.spring.codedesign.launchstarter.sort.TaskSortUtil;
-import com.xdroid.spring.codedesign.launchstarter.stat.TaskStat;
-import com.xdroid.spring.codedesign.launchstarter.task.DispatchRunnable;
-import com.xdroid.spring.codedesign.launchstarter.task.Task;
-import com.xdroid.spring.codedesign.launchstarter.task.TaskCallBack;
-import com.xdroid.spring.codedesign.launchstarter.utils.DispatcherLog;
+import com.xdroid.spring.codedesign.launchstarter.sort.X_TaskSortUtil;
+import com.xdroid.spring.codedesign.launchstarter.stat.X_TaskState;
+import com.xdroid.spring.codedesign.launchstarter.task.X_DispatchRunnable;
+import com.xdroid.spring.codedesign.launchstarter.task.XDChildThreadTask;
+import com.xdroid.spring.codedesign.launchstarter.task.X_TaskCallBack;
+import com.xdroid.spring.codedesign.launchstarter.utils.X_DispatcherLog;
 import com.xdroid.spring.codedesign.log.X_Log;
-import com.xdroid.spring.codedesign.utils.Utils;
+import com.xdroid.spring.codedesign.launchstarter.utils.X_Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 启动器调用类
  */
 
-public class TaskDispatcher {
+public class XDTaskLauncher {
     private static final String TAG = "TaskDispatcher";
     private static boolean isDebug = true;
     private long mStartTime;
@@ -38,38 +37,38 @@ public class TaskDispatcher {
     private static boolean sIsMainProcess;
     private List<Future> mFutures = new ArrayList<>();
     private static volatile boolean sHasInit;
-    private List<Task> mAllTasks = new ArrayList<>();
-    private List<Class<? extends Task>> mClsAllTasks = new ArrayList<>();
-    private volatile List<Task> mMainThreadTasks = new ArrayList<>();
+    private List<XDChildThreadTask> mAllTasks = new ArrayList<>();
+    private List<Class<? extends XDChildThreadTask>> mClsAllTasks = new ArrayList<>();
+    private volatile List<XDChildThreadTask> mMainThreadTasks = new ArrayList<>();
     private CountDownLatch mCountDownLatch;
     //保存需要Wait的Task的数量
     private AtomicInteger mNeedWaitCount = new AtomicInteger();
     //调用了await的时候还没结束的且需要等待的Task
-    private List<Task> mNeedWaitTasks = new ArrayList<>();
+    private List<XDChildThreadTask> mNeedWaitTasks = new ArrayList<>();
     //已经结束了的Task
-    private volatile List<Class<? extends Task>> mFinishedTasks = new ArrayList<>(100);
-    private HashMap<Class<? extends Task>, ArrayList<Task>> mDependedHashMap = new HashMap<>();
+    private volatile List<Class<? extends XDChildThreadTask>> mFinishedTasks = new ArrayList<>(100);
+    private HashMap<Class<? extends XDChildThreadTask>, ArrayList<XDChildThreadTask>> mDependedHashMap = new HashMap<>();
     //启动器分析的次数，统计下分析的耗时；
     private AtomicInteger mAnalyseCount = new AtomicInteger();
 
-    private TaskDispatcher() {
+    private XDTaskLauncher() {
     }
 
     private static void init(Context context) {
         sContext = Objects.requireNonNull(context);
         sHasInit = true;
-        sIsMainProcess = Utils.isMainProcess(sContext);
+        sIsMainProcess = X_Utils.isMainProcess(sContext);
     }
 
     /**
      * 注意：每次获取的都是新对象
      */
-    public static TaskDispatcher newInstance(Context context) {
+    public static XDTaskLauncher newInstance(Context context) {
         init(context);
-        return new TaskDispatcher();
+        return new XDTaskLauncher();
     }
 
-    public TaskDispatcher addTask(Task task) {
+    public XDTaskLauncher addTask(XDChildThreadTask task) {
         if (task != null) {
             collectDepends(task);
             mAllTasks.add(task);
@@ -83,8 +82,8 @@ public class TaskDispatcher {
         return this;
     }
 
-    public TaskDispatcher addTasks(Task... tasks) {
-        for (Task task : tasks) {
+    public XDTaskLauncher addTasks(XDChildThreadTask... tasks) {
+        for (XDChildThreadTask task : tasks) {
             if (task != null) {
                 collectDepends(task);
                 mAllTasks.add(task);
@@ -99,11 +98,11 @@ public class TaskDispatcher {
         return this;
     }
 
-    private void collectDepends(Task task) {
+    private void collectDepends(XDChildThreadTask task) {
         if (task.dependsOn() != null && task.dependsOn().size() > 0) {
-            for (Class<? extends Task> cls : task.dependsOn()) {
+            for (Class<? extends XDChildThreadTask> cls : task.dependsOn()) {
                 if (mDependedHashMap.get(cls) == null) {
-                    mDependedHashMap.put(cls, new ArrayList<Task>());
+                    mDependedHashMap.put(cls, new ArrayList<XDChildThreadTask>());
                 }
                 mDependedHashMap.get(cls).add(task);
                 if (mFinishedTasks.contains(cls)) {
@@ -113,7 +112,7 @@ public class TaskDispatcher {
         }
     }
 
-    private boolean ifNeedWait(Task task) {
+    private boolean ifNeedWait(XDChildThreadTask task) {
         return !task.runOnMainThread() && task.needWait();
     }
 
@@ -126,7 +125,7 @@ public class TaskDispatcher {
         if (mAllTasks.size() > 0) {
             mAnalyseCount.getAndIncrement();
             printDependedMsg();
-            mAllTasks = TaskSortUtil.getSortResult(mAllTasks, mClsAllTasks);
+            mAllTasks = X_TaskSortUtil.getSortResult(mAllTasks, mClsAllTasks);
             mCountDownLatch = new CountDownLatch(mNeedWaitCount.get());
 
             sendAndExecuteAsyncTasks();
@@ -146,10 +145,10 @@ public class TaskDispatcher {
 
     private void executeTaskMain() {
         mStartTime = System.currentTimeMillis();
-        for (Task task : mMainThreadTasks) {
+        for (XDChildThreadTask task : mMainThreadTasks) {
             long time = System.currentTimeMillis();
             X_Log.i(TAG, "executeTaskMain: 开始执行");
-            new DispatchRunnable(task, this).run();
+            new X_DispatchRunnable(task, this).run();
             X_Log.i("", "real main " + task.getClass().getSimpleName() + " cost   " +
                     (System.currentTimeMillis() - time));
         }
@@ -158,7 +157,7 @@ public class TaskDispatcher {
 
     private void sendAndExecuteAsyncTasks() {
         X_Log.i(TAG, "sendAndExecuteAsyncTasks: 开始执行");
-        for (Task task : mAllTasks) {
+        for (XDChildThreadTask task : mAllTasks) {
             if (task.onlyInMainProcess() && !sIsMainProcess) {
                 markTaskDone(task);
             } else {
@@ -174,9 +173,9 @@ public class TaskDispatcher {
     private void printDependedMsg() {
         X_Log.i("", "needWait size : " + (mNeedWaitCount.get()));
         if (false) {
-            for (Class<? extends Task> cls : mDependedHashMap.keySet()) {
+            for (Class<? extends XDChildThreadTask> cls : mDependedHashMap.keySet()) {
                 X_Log.i("", "cls " + cls.getSimpleName() + "   " + mDependedHashMap.get(cls).size());
-                for (Task task : mDependedHashMap.get(cls)) {
+                for (XDChildThreadTask task : mDependedHashMap.get(cls)) {
                     X_Log.i("", "cls       " + task.getClass().getSimpleName());
                 }
             }
@@ -188,16 +187,16 @@ public class TaskDispatcher {
      *
      * @param launchTask
      */
-    public void satisfyChildren(Task launchTask) {
-        ArrayList<Task> arrayList = mDependedHashMap.get(launchTask.getClass());
+    public void satisfyChildren(XDChildThreadTask launchTask) {
+        ArrayList<XDChildThreadTask> arrayList = mDependedHashMap.get(launchTask.getClass());
         if (arrayList != null && arrayList.size() > 0) {
-            for (Task task : arrayList) {
+            for (XDChildThreadTask task : arrayList) {
                 task.satisfy();
             }
         }
     }
 
-    public void markTaskDone(Task task) {
+    public void markTaskDone(XDChildThreadTask task) {
         if (ifNeedWait(task)) {
             mFinishedTasks.add(task.getClass());
             mNeedWaitTasks.remove(task);
@@ -206,15 +205,15 @@ public class TaskDispatcher {
         }
     }
 
-    private void sendTaskReal(final Task task) {
+    private void sendTaskReal(final XDChildThreadTask task) {
         if (task.runOnMainThread()) {
             mMainThreadTasks.add(task);
 
             if (task.needCall()) {
-                task.setTaskCallBack(new TaskCallBack() {
+                task.setTaskCallBack(new X_TaskCallBack() {
                     @Override
                     public void call() {
-                        TaskStat.markTaskDone();
+                        X_TaskState.markTaskDone();
                         task.setFinished(true);
                         satisfyChildren(task);
                         markTaskDone(task);
@@ -226,24 +225,24 @@ public class TaskDispatcher {
             }
         } else {
             // 直接发，是否执行取决于具体线程池
-            Future future = task.runOn().submit(new DispatchRunnable(task, this));
+            Future future = task.runOn().submit(new X_DispatchRunnable(task, this));
             mFutures.add(future);
         }
     }
 
-    public void executeTask(Task task) {
+    public void executeTask(XDChildThreadTask task) {
         if (ifNeedWait(task)) {
             mNeedWaitCount.getAndIncrement();
         }
-        task.runOn().execute(new DispatchRunnable(task, this));
+        task.runOn().execute(new X_DispatchRunnable(task, this));
     }
 
     @UiThread
     private void await() {
         try {
-            if (DispatcherLog.isDebug()) {
+            if (X_DispatcherLog.isDebug()) {
                 X_Log.i("", "still has " + mNeedWaitCount.get());
-                for (Task task : mNeedWaitTasks) {
+                for (XDChildThreadTask task : mNeedWaitTasks) {
                     X_Log.i("", "needWait: " + task.getClass().getSimpleName());
                 }
             }

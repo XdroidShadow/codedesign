@@ -4,17 +4,17 @@ import android.content.Context;
 import android.os.Process;
 
 
-import com.xdroid.spring.codedesign.launchstarter.TaskDispatcher;
-import com.xdroid.spring.codedesign.launchstarter.utils.DispatcherExecutor;
+import com.xdroid.spring.codedesign.launchstarter.XDTaskLauncher;
+import com.xdroid.spring.codedesign.launchstarter.utils.X_DispatcherExecutor;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
-public abstract class Task implements ITask {
+public abstract class XDChildThreadTask implements X_ITask {
     protected String mTag = getClass().getSimpleName().toString();
-    protected Context mContext = TaskDispatcher.getContext();
-    protected boolean mIsMainProcess = TaskDispatcher.isMainProcess();// 当前进程是否是主进程
+    protected Context mContext = XDTaskLauncher.getContext();
+    protected boolean mIsMainProcess = XDTaskLauncher.isMainProcess();// 当前进程是否是主进程
     private volatile boolean mIsWaiting;// 是否正在等待
     private volatile boolean mIsRunning;// 是否正在执行
     private volatile boolean mIsFinished;// Task是否执行完成
@@ -67,7 +67,7 @@ public abstract class Task implements ITask {
      */
     @Override
     public ExecutorService runOn() {
-        return DispatcherExecutor.getIOExecutor();
+        return X_DispatcherExecutor.getIOExecutor();
     }
 
     /**
@@ -86,7 +86,7 @@ public abstract class Task implements ITask {
      * @return
      */
     @Override
-    public List<Class<? extends Task>> dependsOn() {
+    public List<Class<? extends XDChildThreadTask>> dependsOn() {
         return null;
     }
 
@@ -101,7 +101,7 @@ public abstract class Task implements ITask {
     }
 
     @Override
-    public void setTaskCallBack(TaskCallBack callBack) {}
+    public void setTaskCallBack(X_TaskCallBack callBack) {}
 
     @Override
     public boolean needCall() {

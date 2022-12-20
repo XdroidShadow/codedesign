@@ -1,6 +1,6 @@
 package com.xdroid.spring.codedesign.launchstarter.task;
 
-public abstract class MainTask extends Task {
+public abstract class XDMainTask extends XDChildThreadTask {
 
     @Override
     public boolean runOnMainThread() {

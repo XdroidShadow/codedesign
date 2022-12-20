@@ -1,6 +1,7 @@
 package com.xd.spring2;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import com.xd.spring2.launchstarter.tasks.GetDeviceIdTask;
@@ -8,7 +9,7 @@ import com.xd.spring2.launchstarter.tasks.InitAMapTask;
 import com.xd.spring2.launchstarter.tasks.InitBuglyTask;
 import com.xd.spring2.launchstarter.tasks.InitFrescoTask;
 import com.xd.spring2.launchstarter.tasks.InitJPushTask;
-import com.xdroid.spring.codedesign.launchstarter.TaskDispatcher;
+import com.xdroid.spring.codedesign.launchstarter.XDTaskLauncher;
 
 public class XDApp extends Application {
     private static final String TAG = "XDApp";
@@ -18,7 +19,7 @@ public class XDApp extends Application {
         super.onCreate();
         Log.e(TAG, "onCreate1: ");
 
-        TaskDispatcher.newInstance(this).addTasks(
+        XDTaskLauncher.newInstance(this).addTasks(
                 new InitJPushTask(),
                 new InitFrescoTask(),
                 new InitAMapTask(),
@@ -33,6 +34,16 @@ public class XDApp extends Application {
 
     private void init() {
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+
+    }
+
+    @Override
+    public Context getApplicationContext() {
+        return this;
     }
 
 

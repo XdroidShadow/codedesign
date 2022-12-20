@@ -4,8 +4,8 @@ import android.os.Looper;
 import android.os.MessageQueue;
 
 
-import com.xdroid.spring.codedesign.launchstarter.task.DispatchRunnable;
-import com.xdroid.spring.codedesign.launchstarter.task.Task;
+import com.xdroid.spring.codedesign.launchstarter.task.X_DispatchRunnable;
+import com.xdroid.spring.codedesign.launchstarter.task.XDChildThreadTask;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -14,9 +14,9 @@ import java.util.Queue;
  * 用于执行需要延迟加载的任务，让系统空闲的时候再执行
  * 一次只执行一个任务
  */
-public class DelayInitDispatcher {
+public class XDTaskLauncherDelayed {
 
-    private Queue<Task> mDelayTasks = new LinkedList<>();
+    private Queue<XDChildThreadTask> mDelayTasks = new LinkedList<>();
 
     /**
      * return !mDelayTasks.isEmpty();
@@ -26,15 +26,15 @@ public class DelayInitDispatcher {
         @Override
         public boolean queueIdle() {
             if (mDelayTasks.size() > 0) {
-                Task task = mDelayTasks.poll();
-                new DispatchRunnable(task).run();
+                XDChildThreadTask task = mDelayTasks.poll();
+                new X_DispatchRunnable(task).run();
             }
             //当任务队列被执行完时，退出
             return !mDelayTasks.isEmpty();
         }
     };
 
-    public DelayInitDispatcher addTask(Task task) {
+    public XDTaskLauncherDelayed addTask(XDChildThreadTask task) {
         mDelayTasks.add(task);
         return this;
     }

@@ -1,13 +1,10 @@
 package com.xd.spring2.launchstarter.tasks;
 
 
-import android.util.Log;
-
-import com.xdroid.spring.codedesign.launchstarter.task.MainTask;
-import com.xdroid.spring.codedesign.launchstarter.task.Task;
+import com.xdroid.spring.codedesign.launchstarter.task.XDMainTask;
 import com.xdroid.spring.codedesign.log.X_Log;
 
-public class InitBuglyTask extends MainTask {
+public class InitBuglyTask extends XDMainTask {
     private static final String TAG = "InitBuglyTask";
 
     @Override

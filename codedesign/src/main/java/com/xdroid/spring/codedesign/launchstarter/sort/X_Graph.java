@@ -9,13 +9,13 @@ import java.util.Vector;
 /**
  * 有向无环图的拓扑排序算法
  */
-public class Graph {
+public class X_Graph {
     //顶点数
     private int mVerticeCount;
     //邻接表
     private List<Integer>[] mAdj;
 
-    public Graph(int verticeCount) {
+    public X_Graph(int verticeCount) {
         this.mVerticeCount = verticeCount;
         mAdj = new ArrayList[mVerticeCount];
         for (int i = 0; i < mVerticeCount; i++) {

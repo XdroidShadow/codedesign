@@ -7,7 +7,7 @@ import androidx.annotation.IntRange;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public interface ITask {
+public interface X_ITask {
 
     /**
      * 优先级的范围，可根据Task重要程度及工作量指定；之后根据实际情况决定是否有必要放更大
@@ -31,7 +31,7 @@ public interface ITask {
      *
      * @return
      */
-    List<Class<? extends Task>> dependsOn();
+    List<Class<? extends XDChildThreadTask>> dependsOn();
 
     /**
      * 异步线程执行的Task是否需要在被调用await的时候等待，默认不需要
@@ -58,7 +58,7 @@ public interface ITask {
      */
     Runnable getTailRunnable();
 
-    void setTaskCallBack(TaskCallBack callBack);
+    void setTaskCallBack(X_TaskCallBack callBack);
 
     boolean needCall();
 }

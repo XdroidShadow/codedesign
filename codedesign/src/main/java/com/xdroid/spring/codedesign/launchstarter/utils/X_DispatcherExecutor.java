@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DispatcherExecutor {
+public class X_DispatcherExecutor {
     private static ThreadPoolExecutor sCPUThreadPoolExecutor;
     private static ExecutorService sIOThreadPoolExecutor;
 

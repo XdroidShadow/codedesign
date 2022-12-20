@@ -1,13 +1,10 @@
 package com.xd.spring2.launchstarter.tasks;
 
 
-import android.content.Context;
-import android.telephony.TelephonyManager;
-
-import com.xdroid.spring.codedesign.launchstarter.task.Task;
+import com.xdroid.spring.codedesign.launchstarter.task.XDChildThreadTask;
 import com.xdroid.spring.codedesign.log.X_Log;
 
-public class InitAMapTask extends Task {
+public class InitAMapTask extends XDChildThreadTask {
     private static final String TAG = "InitAMapTask";
 
     @Override
