@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
-public abstract class XDChildThreadTask implements X_ITask {
+public abstract class XDTask implements X_ITask {
     protected String mTag = getClass().getSimpleName().toString();
     protected Context mContext = XDTaskLauncher.getContext();
     protected boolean mIsMainProcess = XDTaskLauncher.isMainProcess();// 当前进程是否是主进程
@@ -86,7 +86,7 @@ public abstract class XDChildThreadTask implements X_ITask {
      * @return
      */
     @Override
-    public List<Class<? extends XDChildThreadTask>> dependsOn() {
+    public List<Class<? extends XDTask>> dependsOn() {
         return null;
     }
 

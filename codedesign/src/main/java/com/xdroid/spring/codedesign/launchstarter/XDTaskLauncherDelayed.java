@@ -5,7 +5,8 @@ import android.os.MessageQueue;
 
 
 import com.xdroid.spring.codedesign.launchstarter.task.X_DispatchRunnable;
-import com.xdroid.spring.codedesign.launchstarter.task.XDChildThreadTask;
+import com.xdroid.spring.codedesign.launchstarter.task.XDTask;
+import com.xdroid.spring.codedesign.log.X_Log;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -15,8 +16,9 @@ import java.util.Queue;
  * 一次只执行一个任务
  */
 public class XDTaskLauncherDelayed {
+    private static final String TAG = "XDTaskLauncherDelayed";
 
-    private Queue<XDChildThreadTask> mDelayTasks = new LinkedList<>();
+    private Queue<XDTask> mDelayTasks = new LinkedList<>();
 
     /**
      * return !mDelayTasks.isEmpty();
@@ -26,7 +28,7 @@ public class XDTaskLauncherDelayed {
         @Override
         public boolean queueIdle() {
             if (mDelayTasks.size() > 0) {
-                XDChildThreadTask task = mDelayTasks.poll();
+                XDTask task = mDelayTasks.poll();
                 new X_DispatchRunnable(task).run();
             }
             //当任务队列被执行完时，退出
@@ -34,7 +36,7 @@ public class XDTaskLauncherDelayed {
         }
     };
 
-    public XDTaskLauncherDelayed addTask(XDChildThreadTask task) {
+    public XDTaskLauncherDelayed addTask(XDTask task) {
         mDelayTasks.add(task);
         return this;
     }
@@ -43,7 +45,11 @@ public class XDTaskLauncherDelayed {
      * 开启
      */
     public void start() {
-        Looper.myQueue().addIdleHandler(mIdleHandler);
+        if (Thread.currentThread().getName().equals("main")) {
+            Looper.myQueue().addIdleHandler(mIdleHandler);
+        }else {
+            X_Log.e(TAG,"延迟启动器只能在主线程执行！");
+        }
     }
 
 }

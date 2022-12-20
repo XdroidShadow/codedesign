@@ -12,14 +12,14 @@ import com.xdroid.spring.codedesign.log.X_Log;
 
 public class X_DispatchRunnable implements Runnable {
     private static final String TAG = "DispatchRunnable";
-    private XDChildThreadTask mTask;
+    private XDTask mTask;
     private XDTaskLauncher mTaskDispatcher;
 
-    public X_DispatchRunnable(XDChildThreadTask task) {
+    public X_DispatchRunnable(XDTask task) {
         this.mTask = task;
     }
 
-    public X_DispatchRunnable(XDChildThreadTask task, XDTaskLauncher dispatcher) {
+    public X_DispatchRunnable(XDTask task, XDTaskLauncher dispatcher) {
         this.mTask = task;
         this.mTaskDispatcher = dispatcher;
     }

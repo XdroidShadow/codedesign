@@ -1,19 +1,19 @@
 package com.xd.spring2.launchstarter.tasks;
 
 
-import com.xdroid.spring.codedesign.launchstarter.task.XDChildThreadTask;
+import com.xdroid.spring.codedesign.launchstarter.task.XDTask;
 import com.xdroid.spring.codedesign.log.X_Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class InitFrescoTask extends XDChildThreadTask {
+public class InitFrescoTask extends XDTask {
     private static final String TAG = "InitFrescoTask";
 
 
     @Override
-    public List<Class<? extends XDChildThreadTask>> dependsOn() {
-        return new ArrayList<Class<? extends XDChildThreadTask>>() {
+    public List<Class<? extends XDTask>> dependsOn() {
+        return new ArrayList<Class<? extends XDTask>>() {
             {
                 add(GetDeviceIdTask.class);
                 add(InitAMapTask.class);

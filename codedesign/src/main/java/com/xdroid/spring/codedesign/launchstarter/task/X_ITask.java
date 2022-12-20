@@ -31,7 +31,7 @@ public interface X_ITask {
      *
      * @return
      */
-    List<Class<? extends XDChildThreadTask>> dependsOn();
+    List<Class<? extends XDTask>> dependsOn();
 
     /**
      * 异步线程执行的Task是否需要在被调用await的时候等待，默认不需要

@@ -3,11 +3,11 @@ package com.xd.spring2.launchstarter.tasks;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 
-import com.xdroid.spring.codedesign.launchstarter.task.XDChildThreadTask;
+import com.xdroid.spring.codedesign.launchstarter.task.XDTask;
 import com.xdroid.spring.codedesign.log.X_Log;
 
 
-public class GetDeviceIdTask extends XDChildThreadTask {
+public class GetDeviceIdTask extends XDTask {
     private static final String TAG = "GetDeviceIdTask";
     private String mDeviceId;
 

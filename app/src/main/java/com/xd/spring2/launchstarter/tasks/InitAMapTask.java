@@ -1,10 +1,10 @@
 package com.xd.spring2.launchstarter.tasks;
 
 
-import com.xdroid.spring.codedesign.launchstarter.task.XDChildThreadTask;
+import com.xdroid.spring.codedesign.launchstarter.task.XDTask;
 import com.xdroid.spring.codedesign.log.X_Log;
 
-public class InitAMapTask extends XDChildThreadTask {
+public class InitAMapTask extends XDTask {
     private static final String TAG = "InitAMapTask";
 
     @Override
